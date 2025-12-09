@@ -23,15 +23,13 @@ class PartSeeder extends Seeder
                 'material' => 'Steel',
                 'department' => 'Assembly',
                 'section' => 'Section 1',
-                'MCT' => 2.5,
-                'CT' => 3.0,
+                'mct' => 2.5,
+                'ct' => 3.0,
                 'avg_output_per_day' => 100,
                 'main_reject_reason' => 'Surface defect',
                 'qal' => 'pdfs/qal_part_a.pdf',
                 'work_layout' => 'pdfs/layout_part_a.pdf',
                 'work_instruction' => 'pdfs/instruction_part_a.pdf',
-                'created_at' => now(),
-                'updated_at' => now()
             ],
             [
                 'part_name' => 'Part B',
@@ -42,15 +40,13 @@ class PartSeeder extends Seeder
                 'material' => 'Aluminium',
                 'department' => 'Fabrication',
                 'section' => 'Section 2',
-                'MCT' => 1.8,
-                'CT' => 2.0,
+                'mct' => 1.8,
+                'ct' => 2.0,
                 'avg_output_per_day' => 150,
                 'main_reject_reason' => 'Dimension error',
                 'qal' => 'pdfs/qal_part_b.pdf',
                 'work_layout' => 'pdfs/layout_part_b.pdf',
                 'work_instruction' => 'pdfs/instruction_part_b.pdf',
-                'created_at' => now(),
-                'updated_at' => now()
             ]
         ]);
     }
