@@ -2,72 +2,65 @@
 
 @section('content')
 
-<div class="flex gap-10">
+<div class="grid grid-cols-2 gap-10">
 
-    <!-- Left side image -->
-    <div class="w-1/2">
-        <div class="w-full aspect-video bg-gray-200 rounded mb-4"></div>
+    <!-- Left: Part Image -->
+    <div class="w-full h-[400px] bg-gray-200 rounded mb-4 overflow-hidden flex items-center justify-center">
+        @if($part->part_image && file_exists(public_path('uploads/parts/images/' . $part->part_image)))
+            <img src="{{ asset('uploads/parts/images/' . $part->part_image) }}" 
+                alt="{{ $part->part_name }}" class="h-full object-contain">
+        @else
+            <span class="text-gray-400">No Image Available</span>
+        @endif
+    </div>
 
-        <div class="flex justify-between mt-2">
-            <p class="font-semibold">Short description / purpose</p>
-            <p class="font-semibold">Main Reject Reason</p>
+    <!-- Right: Details + PDFs -->
+    <div class="space-y-4">
+        <div class="mt-2 text-gray-700 space-y-1">
+            <p><strong>Name:</strong> {{ $part->part_name }}</p>
+            <p><strong>Department:</strong> {{ $part->department }}</p>
+            <p><strong>Section:</strong> {{ $part->section }}</p>
+            <p><strong>Machine Line:</strong> {{ $part->machine_line }}</p>
+            <p><strong>Operator:</strong> {{ $part->operator }}</p>
+            <p><strong>Material:</strong> {{ $part->material }}</p>
+            <p><strong>MCT:</strong> {{ $part->mct }}</p>
+            <p><strong>CT:</strong> {{ $part->ct }}</p>
+            <p><strong>Avg Output per Day:</strong> {{ $part->avg_output_per_day }}</p>
+            <p><strong>Main Reject Reason:</strong> {{ $part->main_reject_reason }}</p>
+        </div>
+
+        <div class="space-y-4 mt-6">
+            <h2 class="text-xl font-bold mb-2">PDF Documents</h2>
+
+            @if($part->qal && file_exists(public_path('uploads/parts/qal/' . $part->qal)))
+                <div class="flex items-center gap-2">
+                    <a href="{{ asset('uploads/parts/qal/' . $part->qal) }}" target="_blank" 
+                    class="px-3 py-1 bg-blue-500 text-white rounded text-sm">Preview QAL</a>
+                    <a href="{{ asset('uploads/parts/qal/' . $part->qal) }}" download 
+                    class="px-3 py-1 bg-gray-200 rounded text-sm">Download QAL</a>
+                </div>
+            @endif
+
+            @if($part->work_layout && file_exists(public_path('uploads/parts/work_layout/' . $part->work_layout)))
+                <div class="flex items-center gap-2">
+                    <a href="{{ asset('uploads/parts/work_layout/' . $part->work_layout) }}" target="_blank" 
+                    class="px-3 py-1 bg-blue-500 text-white rounded text-sm">Preview Layout</a>
+                    <a href="{{ asset('uploads/parts/work_layout/' . $part->work_layout) }}" download 
+                    class="px-3 py-1 bg-gray-200 rounded text-sm">Download Layout</a>
+                </div>
+            @endif
+
+            @if($part->work_instruction && file_exists(public_path('uploads/parts/work_instruction/' . $part->work_instruction)))
+                <div class="flex items-center gap-2">
+                    <a href="{{ asset('uploads/parts/work_instruction/' . $part->work_instruction) }}" target="_blank" 
+                    class="px-3 py-1 bg-blue-500 text-white rounded text-sm">Preview Instruction</a>
+                    <a href="{{ asset('uploads/parts/work_instruction/' . $part->work_instruction) }}" download 
+                    class="px-3 py-1 bg-gray-200 rounded text-sm">Download Instruction</a>
+                </div>
+            @endif
         </div>
     </div>
 
-    <!-- Right side details -->
-    <div class="w-1/2 space-y-3">
-
-        <h1 class="text-2xl font-bold">{{ $part->part_name }}</h1>
-
-        <span class="bg-green-200 text-green-800 px-3 py-1 rounded text-sm">
-            {{ $part->department }}
-        </span>
-
-        <p class="font-semibold">
-            {{ $part->machine_line }} + {{ $part->operator }}
-        </p>
-
-        <div class="grid grid-cols-2 text-gray-700 mt-4">
-            <div>
-                <p>Material: <strong>{{ $part->material }}</strong></p>
-                <p>MCT: <strong>{{ $part->mct }}</strong></p>
-                <p>CT: <strong>{{ $part->ct }}</strong></p>
-            </div>
-
-            <div>
-                <p>Avg O/P: <strong>{{ $part->avg_output_per_day }}</strong></p>
-            </div>
-        </div>
-
-        <div class="grid grid-cols-2 gap-4 mt-4">
-            <div>
-                <label class="font-semibold">Label</label>
-                <select class="border p-2 rounded w-full">
-                    <option>Value</option>
-                </select>
-            </div>
-
-            <div>
-                <label class="font-semibold">Label</label>
-                <select class="border p-2 rounded w-full">
-                    <option>Value</option>
-                </select>
-            </div>
-        </div>
-
-        <!-- Button -->
-        <button class="w-full bg-black text-white py-2 rounded mt-4">
-            Button
-        </button>
-
-        <!-- PDFs -->
-        <div class="mt-6 space-y-2">
-            <a href="{{ route('pdf.download', $part->qal) }}" class="underline">QAL PDF</a><br>
-            <a href="{{ route('pdf.download', $part->work_layout) }}" class="underline">Work Layout</a><br>
-            <a href="{{ route('pdf.download', $part->work_instruction) }}" class="underline">Work Instruction</a>
-        </div>
-
-    </div>
 </div>
 
 @endsection

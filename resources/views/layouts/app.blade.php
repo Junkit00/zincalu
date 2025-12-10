@@ -18,7 +18,7 @@
         <nav class="space-y-2 px-4">
             <a href="{{ route('dashboard') }}" class="block bg-gray-200 py-2 px-4 rounded">Dashboard</a>
             <a href="#" class="block bg-gray-200 py-2 px-4 rounded">Account</a>
-            <a href="#" class="block bg-gray-200 py-2 px-4 rounded">Manage</a>
+            <a href="{{ route('parts.manage') }}" class="block bg-gray-200 py-2 px-4 rounded">Manage</a>
         </nav>
     </aside>
 
