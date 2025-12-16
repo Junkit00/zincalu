@@ -6,7 +6,7 @@
 <div class="mb-6">
     <h2 class="text-xl font-semibold mb-3">Search</h2>
 
-    <form method="GET" action="{{ route('dashboard') }}" class="grid grid-cols-3 gap-4">
+    <form method="GET" action="{{ route('dashboard') }}" class="grid grid-cols-4 gap-4">
 
         <input type="text" name="part_name" class="border p-2 rounded" 
                placeholder="Part Name" value="{{ request('part_name') }}">
@@ -18,6 +18,11 @@
                 <option value="{{ $customer }}"></option>
             @endforeach
         </datalist>
+
+        <select name="sort_order" class="border p-2 rounded">
+            <option value="asc" {{ request('sort_order') == 'asc' ? 'selected' : '' }}>A → Z</option>
+            <option value="desc" {{ request('sort_order') == 'desc' ? 'selected' : '' }}>Z → A</option>
+        </select>
 
         <button type="submit" class="bg-black text-white px-4 py-2 rounded">Search</button>
     </form>

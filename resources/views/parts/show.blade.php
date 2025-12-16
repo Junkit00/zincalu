@@ -16,13 +16,15 @@
 
     <!-- Right: Details + PDFs -->
     <div class="space-y-4">
+        <h2 class="text-xl font-bold mb-2">Part Details</h2>
         <div class="mt-2 text-gray-700 space-y-1">
             <p><strong>Name:</strong> {{ $part->part_name }}</p>
+            <p><strong>Customer:</strong> {{ $part->customer }}</p>
+            <p><strong>Material:</strong> {{ $part->material }}</p>
             <p><strong>Department:</strong> {{ $part->department }}</p>
             <p><strong>Section:</strong> {{ $part->section }}</p>
-            <p><strong>Machine Line:</strong> {{ $part->machine_line }}</p>
+            <p><strong>Machine/Line:</strong> {{ $part->machine_line }}</p>
             <p><strong>Operator:</strong> {{ $part->operator }}</p>
-            <p><strong>Material:</strong> {{ $part->material }}</p>
             <p><strong>MCT:</strong> {{ $part->mct }}</p>
             <p><strong>CT:</strong> {{ $part->ct }}</p>
             <p><strong>Avg Output per Day:</strong> {{ $part->avg_output_per_day }}</p>

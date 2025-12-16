@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PartController;
+use App\Http\Controllers\CustomerController;
 
 Route::get('/', [PartController::class, 'index'])->name('dashboard');
 
@@ -16,6 +17,10 @@ Route::post('/manage/parts', [PartController::class, 'store'])->name('parts.stor
 Route::get('/manage/parts/{id}/edit', [PartController::class, 'edit'])->name('parts.edit');
 Route::put('/manage/parts/{id}', [PartController::class, 'update'])->name('parts.update');
 Route::delete('/manage/parts/{id}', [PartController::class, 'destroy'])->name('parts.destroy');
+
+// Customer Page
+Route::get('/customers', [CustomerController::class, 'index'])->name('customers.index');
+Route::get('/customers/{customer}', [CustomerController::class, 'parts'])->name('customers.part');
 
 // file downloads (keep if desired)
 Route::get('/pdf/{file}', function ($file) {

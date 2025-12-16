@@ -22,6 +22,9 @@ class PartController extends Controller
             $query->where('customer', 'like', '%' . $request->customer . '%');
         }
 
+        $sortOrder = $request->get('sort_order', 'asc'); // default ascending
+        $query->orderBy('part_name', $sortOrder);
+
         $parts = $query->get();
         $customers = Part::select('customer')->distinct()->pluck('customer');
 
@@ -34,11 +37,8 @@ class PartController extends Controller
         $part = Part::findOrFail($id);
         return view('parts.show', compact('part'));
     }
-
-    /* -----------------------
-       Manage (CRUD) methods
-       ----------------------- */
-
+  
+    // Advanced CRUD
     // Manage listing (same display as index but with action buttons)
     public function manage(Request $request)
     {
@@ -68,23 +68,32 @@ class PartController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'part_name' => 'required|string|max:255',
-            'customer' => 'nullable|string|max:255',
-            'machine_line' => 'nullable|string|max:255',
-            'operator' => 'nullable|string|max:255',
-            'department' => 'nullable|string|max:255',
-            'section' => 'nullable|string|max:255',
-            'material' => 'nullable|string|max:255',
+            'part_name' => ['required', 'string', 'max:255'],
+            'customer' => ['required', 'string', 'max:255'],
+            'machine_line' => ['nullable', 'string', 'max:255'],
+            'operator' => ['nullable', 'string', 'max:255'],
+            'department' => ['required', 'string', 'max:255'],
+            'section' => ['required', 'string', 'max:255'],
+            'material' => ['required', 'string', 'max:255'],
             'mct' => 'nullable|numeric',
             'ct' => 'nullable|numeric',
             'avg_output_per_day' => 'nullable|numeric',
-            'main_reject_reason' => 'nullable|string|max:1000',
+            'main_reject_reason' => ['nullable', 'string', 'max:1000'],
 
-            'part_image' => 'nullable|image|max:5120', // 5MB
+            'part_image' => 'required|image|max:5120',
             'qal' => 'nullable|file|mimes:pdf|max:10240',
             'work_layout' => 'nullable|file|mimes:pdf|max:10240',
             'work_instruction' => 'nullable|file|mimes:pdf|max:10240',
         ]);
+
+        // Convert certain fields to uppercase
+        $validated['part_name'] = strtoupper($validated['part_name']);
+        $validated['customer'] = strtoupper($validated['customer']);
+        $validated['machine_line'] = isset($validated['machine_line']) ? strtoupper($validated['machine_line']) : null;
+        $validated['operator'] = isset($validated['operator']) ? strtoupper($validated['operator']) : null;
+        $validated['department'] = strtoupper($validated['department']);
+        $validated['section'] = strtoupper($validated['section']);
+        $validated['material'] = strtoupper($validated['material']);
 
         // Create part instance
         $part = new Part();
@@ -139,17 +148,17 @@ class PartController extends Controller
         $part = Part::findOrFail($id);
 
         $validated = $request->validate([
-            'part_name' => 'required|string|max:255',
-            'customer' => 'nullable|string|max:255',
-            'machine_line' => 'nullable|string|max:255',
-            'operator' => 'nullable|string|max:255',
-            'department' => 'nullable|string|max:255',
-            'section' => 'nullable|string|max:255',
-            'material' => 'nullable|string|max:255',
+            'part_name' => ['required', 'string', 'max:255'],
+            'customer' => ['required', 'string', 'max:255'],
+            'machine_line' => ['nullable', 'string', 'max:255'],
+            'operator' => ['nullable', 'string', 'max:255'],
+            'department' => ['required', 'string', 'max:255'],
+            'section' => ['required', 'string', 'max:255'],
+            'material' => ['required', 'string', 'max:255'],
             'mct' => 'nullable|numeric',
             'ct' => 'nullable|numeric',
             'avg_output_per_day' => 'nullable|numeric',
-            'main_reject_reason' => 'nullable|string|max:1000',
+            'main_reject_reason' => ['nullable', 'string', 'max:1000'],
 
             'part_image' => 'nullable|image|max:5120',
             'qal' => 'nullable|file|mimes:pdf|max:10240',
@@ -157,6 +166,16 @@ class PartController extends Controller
             'work_instruction' => 'nullable|file|mimes:pdf|max:10240',
         ]);
 
+        // Convert certain fields to uppercase
+        $validated['part_name'] = strtoupper($validated['part_name']);
+        $validated['customer'] = strtoupper($validated['customer']);
+        $validated['machine_line'] = isset($validated['machine_line']) ? strtoupper($validated['machine_line']) : null;
+        $validated['operator'] = isset($validated['operator']) ? strtoupper($validated['operator']) : null;
+        $validated['department'] = strtoupper($validated['department']);
+        $validated['section'] = strtoupper($validated['section']);
+        $validated['material'] = strtoupper($validated['material']);
+
+        // Update part instance
         $part->part_name = $validated['part_name'];
         $part->customer = $validated['customer'] ?? null;
         $part->machine_line = $validated['machine_line'] ?? null;
@@ -224,17 +243,17 @@ class PartController extends Controller
         $part = Part::findOrFail($id);
 
         // delete files if exist
-        if ($part->part_image && File::exists(public_path('uploads/parts/images/' . $part->part_image))) {
-            File::delete(public_path('uploads/parts/images/' . $part->part_image));
+        if ($part->part_image && File::exists(public_path('uploads/parts/Images/' . $part->part_image))) {
+            File::delete(public_path('uploads/parts/Images/' . $part->part_image));
         }
-        if ($part->qal && File::exists(public_path('uploads/parts/qal/' . $part->qal))) {
-            File::delete(public_path('uploads/parts/qal/' . $part->qal));
+        if ($part->qal && File::exists(public_path('uploads/parts/QAL/' . $part->qal))) {
+            File::delete(public_path('uploads/parts/QAL/' . $part->qal));
         }
-        if ($part->work_layout && File::exists(public_path('uploads/parts/work_layout/' . $part->work_layout))) {
-            File::delete(public_path('uploads/parts/work_layout/' . $part->work_layout));
+        if ($part->work_layout && File::exists(public_path('uploads/parts/Work_Layout/' . $part->work_layout))) {
+            File::delete(public_path('uploads/parts/Work_layout/' . $part->work_layout));
         }
-        if ($part->work_instruction && File::exists(public_path('uploads/parts/work_instruction/' . $part->work_instruction))) {
-            File::delete(public_path('uploads/parts/work_instruction/' . $part->work_instruction));
+        if ($part->work_instruction && File::exists(public_path('uploads/parts/Work_Instruction/' . $part->work_instruction))) {
+            File::delete(public_path('uploads/parts/Work_Instruction/' . $part->work_instruction));
         }
 
         $part->delete();

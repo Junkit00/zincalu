@@ -19,6 +19,7 @@
             <a href="{{ route('dashboard') }}" class="block bg-gray-200 py-2 px-4 rounded">Dashboard</a>
             <a href="#" class="block bg-gray-200 py-2 px-4 rounded">Account</a>
             <a href="{{ route('parts.manage') }}" class="block bg-gray-200 py-2 px-4 rounded">Manage</a>
+            <a href="{{ route('customers.index') }}" class="block bg-gray-200 py-2 px-4 rounded">Customer</a>
         </nav>
     </aside>
 
