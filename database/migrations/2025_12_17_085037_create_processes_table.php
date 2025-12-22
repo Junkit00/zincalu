@@ -11,13 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('parts', function (Blueprint $table) {
+        Schema::create('processes', function (Blueprint $table) {
             $table->id();
-            $table->string('part_name');
-            $table->string('customer')->nullable();
-            $table->string('material')->nullable();
-            $table->integer('avg_output_per_day')->nullable();
-            $table->string('part_image')->nullable();
+            $table->string('name'); // Deburr, Polish, etc.
             $table->timestamps();
         });
     }
@@ -27,6 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('parts');
+        Schema::dropIfExists('processes');
     }
 };

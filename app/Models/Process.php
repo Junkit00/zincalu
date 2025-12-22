@@ -4,21 +4,15 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Process;
+use App\Models\Part;
 
-class Part extends Model
+class Process extends Model
 {
-    protected $fillable = [
-        'part_name',
-        'customer',
-        'material',
-        'avg_output_per_day',
-        'part_image',
-    ];
+    protected $fillable = ['name'];
 
-    public function processes()
+    public function parts()
     {
-        return $this->belongsToMany(Process::class, 'part_processes')
+        return $this->belongsToMany(Part::class, 'part_processes')
             ->withPivot([
                 'department',
                 'section',

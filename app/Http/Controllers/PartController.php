@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Part;
+use App\Models\Process;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 
@@ -33,10 +34,13 @@ class PartController extends Controller
 
     // Public show
     public function show($id)
-    {
-        $part = Part::findOrFail($id);
-        return view('parts.show', compact('part'));
-    }
+{
+    // Eager load processes so we can access them in the view
+    $part = Part::with('processes')->findOrFail($id);
+
+    return view('parts.show', compact('part'));
+}
+
   
     // Advanced CRUD
     // Manage listing (same display as index but with action buttons)
@@ -60,80 +64,80 @@ class PartController extends Controller
 
     // Show create form
     public function create()
-    {
-        return view('parts.create');
-    }
+{
+    return view('parts.create');
+}
 
-    // Store new part (with uploaded files)
-    public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'part_name' => ['required', 'string', 'max:255'],
-            'customer' => ['required', 'string', 'max:255'],
-            'machine_line' => ['nullable', 'string', 'max:255'],
-            'operator' => ['nullable', 'string', 'max:255'],
-            'department' => ['required', 'string', 'max:255'],
-            'section' => ['required', 'string', 'max:255'],
-            'material' => ['required', 'string', 'max:255'],
-            'mct' => 'nullable|numeric',
-            'ct' => 'nullable|numeric',
-            'avg_output_per_day' => 'nullable|numeric',
-            'main_reject_reason' => ['nullable', 'string', 'max:1000'],
+// Store new part (with uploaded files and multiple processes)
+public function store(Request $request)
+{
+    $validated = $request->validate([
+        'part_name' => ['required', 'string', 'max:255'],
+        'customer' => ['required', 'string', 'max:255'],
+        'material' => ['required', 'string', 'max:255'],
+        'avg_output_per_day' => 'nullable|numeric',
+        'part_image' => 'required|image|max:5120',
 
-            'part_image' => 'required|image|max:5120',
-            'qal' => 'nullable|file|mimes:pdf|max:10240',
-            'work_layout' => 'nullable|file|mimes:pdf|max:10240',
-            'work_instruction' => 'nullable|file|mimes:pdf|max:10240',
+        // Process-related fields
+        'processes.*' => 'required|in:1,2,3',
+        'departments' => 'required|array',
+        'sections' => 'required|array',
+        'machine_lines' => 'required|array',
+        'operators' => 'required|array',
+        'mcts' => 'nullable|array',
+        'cts' => 'nullable|array',
+        'qals' => 'nullable|array',
+        'work_layouts' => 'nullable|array',
+        'work_instructions' => 'nullable|array',
+    ]);
+
+    // Convert certain fields to uppercase
+    $validated['part_name'] = strtoupper($validated['part_name']);
+    $validated['customer'] = strtoupper($validated['customer']);
+    $validated['material'] = strtoupper($validated['material']);
+
+    // Helper to store a file in public/uploads/parts/<folder>
+    $storeFile = function ($file, $folder) {
+        if (!$file) return null;
+        $orig = $file->getClientOriginalName();
+        $ext = $file->getClientOriginalExtension();
+        $name = pathinfo($orig, PATHINFO_FILENAME);
+        $safe = Str::slug($name) . '_' . time() . '.' . $ext;
+        $destination = public_path("uploads/parts/{$folder}/");
+        if (!File::exists($destination)) {
+            File::makeDirectory($destination, 0755, true);
+        }
+        $file->move($destination, $safe);
+        return $safe;
+    };
+
+    // Create part
+    $part = Part::create([
+        'part_name' => $validated['part_name'],
+        'customer' => $validated['customer'],
+        'material' => $validated['material'],
+        'avg_output_per_day' => $validated['avg_output_per_day'] ?? null,
+        'part_image' => $storeFile($request->file('part_image'), 'images'),
+    ]);
+
+    // Save multiple processes with pivot files
+    foreach ($validated['processes'] as $index => $processId) {
+        $part->processes()->attach($processId, [
+            'department' => strtoupper($validated['departments'][$index] ?? ''),
+            'section' => strtoupper($validated['sections'][$index] ?? ''),
+            'machine_line' => strtoupper($validated['machine_lines'][$index] ?? ''),
+            'operator' => strtoupper($validated['operators'][$index] ?? ''),
+            'mct' => $validated['mcts'][$index] ?? null,
+            'ct' => $validated['cts'][$index] ?? null,
+            'qal' => $storeFile($request->file('qals')[$index] ?? null, 'qal'),
+            'work_layout' => $storeFile($request->file('work_layouts')[$index] ?? null, 'work_layout'),
+            'work_instruction' => $storeFile($request->file('work_instructions')[$index] ?? null, 'work_instruction'),
         ]);
-
-        // Convert certain fields to uppercase
-        $validated['part_name'] = strtoupper($validated['part_name']);
-        $validated['customer'] = strtoupper($validated['customer']);
-        $validated['machine_line'] = isset($validated['machine_line']) ? strtoupper($validated['machine_line']) : null;
-        $validated['operator'] = isset($validated['operator']) ? strtoupper($validated['operator']) : null;
-        $validated['department'] = strtoupper($validated['department']);
-        $validated['section'] = strtoupper($validated['section']);
-        $validated['material'] = strtoupper($validated['material']);
-
-        // Create part instance
-        $part = new Part();
-        $part->part_name = $validated['part_name'];
-        $part->customer = $validated['customer'] ?? null;
-        $part->machine_line = $validated['machine_line'] ?? null;
-        $part->operator = $validated['operator'] ?? null;
-        $part->department = $validated['department'] ?? null;
-        $part->section = $validated['section'] ?? null;
-        $part->material = $validated['material'] ?? null;
-        $part->mct = $validated['mct'] ?? null;
-        $part->ct = $validated['ct'] ?? null;
-        $part->avg_output_per_day = $validated['avg_output_per_day'] ?? null;
-        $part->main_reject_reason = $validated['main_reject_reason'] ?? null;
-
-        // Helper to store a file in public/uploads/parts/<folder>
-        $storeFile = function ($file, $folder) {
-            if (!$file) return null;
-            $orig = $file->getClientOriginalName();
-            $ext = $file->getClientOriginalExtension();
-            $name = pathinfo($orig, PATHINFO_FILENAME);
-            $safe = Str::slug($name) . '_' . time() . '.' . $ext;
-            $destination = public_path("uploads/parts/{$folder}/");
-            if (!File::exists($destination)) {
-                File::makeDirectory($destination, 0755, true);
-            }
-            $file->move($destination, $safe);
-            return $safe;
-        };
-
-        // Store files if uploaded
-        $part->part_image = $storeFile($request->file('part_image'), 'images');
-        $part->qal = $storeFile($request->file('qal'), 'qal');
-        $part->work_layout = $storeFile($request->file('work_layout'), 'work_layout');
-        $part->work_instruction = $storeFile($request->file('work_instruction'), 'work_instruction');
-
-        $part->save();
-
-        return redirect()->route('parts.manage')->with('success', 'Part created successfully.');
     }
+
+    return redirect()->route('parts.manage')->with('success', 'Part created successfully.');
+}
+
 
     // Show edit form
     public function edit($id)

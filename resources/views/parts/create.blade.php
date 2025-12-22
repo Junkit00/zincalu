@@ -2,13 +2,11 @@
 
 @section('content')
 
-<div class="max-w-3xl mx-auto bg-white p-6 rounded shadow">
-
-    <h2 class="text-xl font-semibold mb-4">Create New Part</h2>
+<div class="max-w-3xl mx-auto bg-white p-4 rounded shadow">
 
     @if ($errors->any())
         <div class="bg-red-100 text-red-800 p-3 rounded mb-4">
-            <ul class="list-disc pl-5">
+            <ul>
                 @foreach ($errors->all() as $error)
                     <li>{{ $error }}</li>
                 @endforeach
@@ -16,95 +14,146 @@
         </div>
     @endif
 
+    <h2 class="text-xl font-semibold mb-6">Create New Part</h2>
+
     <form action="{{ route('parts.store') }}" method="POST" enctype="multipart/form-data">
         @csrf
 
-        <div class="grid grid-cols-2 gap-4">
+        {{-- Part Information --}}
+        <h3 class="font-semibold text-lg mb-3">Part Information</h3>
+        <div class="grid grid-cols-2 gap-4 mb-6">
             <div>
-                <label class="block font-semibold">Part Name</label>
-                <input type="text" name="part_name" class="border p-2 rounded w-full" value="{{ old('part_name') }}" required>
+                <label class="font-semibold">Part Name</label>
+                <input type="text" name="part_name" class="border p-2 rounded w-full" required>
             </div>
 
             <div>
-                <label class="block font-semibold">Customer</label>
-                <input type="text" name="customer" class="border p-2 rounded w-full" value="{{ old('customer') }}">
+                <label class="font-semibold">Customer</label>
+                <input type="text" name="customer" class="border p-2 rounded w-full" required>
             </div>
 
             <div>
-                <label class="block font-semibold">Machine Line</label>
-                <input type="text" name="machine_line" class="border p-2 rounded w-full" value="{{ old('machine_line') }}">
+                <label class="font-semibold">Material</label>
+                <input type="text" name="material" class="border p-2 rounded w-full" required>
             </div>
 
             <div>
-                <label class="block font-semibold">Operator</label>
-                <input type="text" name="operator" class="border p-2 rounded w-full" value="{{ old('operator') }}">
+                <label class="font-semibold">Avg Output (Day)</label>
+                <input type="number" name="avg_output_per_day" class="border p-2 rounded w-full">
             </div>
 
-            <div>
-                <label class="block font-semibold">Department</label>
-                <input type="text" name="department" class="border p-2 rounded w-full" value="{{ old('department') }}">
-            </div>
-
-             <div>
-                <label class="block font-semibold">Section</label>
-                <input type="text" name="section" class="border p-2 rounded w-full" value="{{ old('section') }}">
-            </div>
-
-            <div>
-                <label class="block font-semibold">Material</label>
-                <input type="text" name="material" class="border p-2 rounded w-full" value="{{ old('material') }}">
-            </div>
-
-            <div>
-                <label class="block font-semibold">MCT</label>
-                <input type="number" name="mct" class="border p-2 rounded w-full" value="{{ old('mct') }}">
-            </div>
-
-            <div>
-                <label class="block font-semibold">CT</label>
-                <input type="number" name="ct" class="border p-2 rounded w-full" value="{{ old('ct') }}">
-            </div>
-
-            <div>
-                <label class="block font-semibold">Avg Output per Day</label>
-                <input type="number" name="avg_output_per_day" class="border p-2 rounded w-full" value="{{ old('avg_output_per_day') }}">
-            </div>
-
-            <div>
-                <label class="block font-semibold">Main Reject Reason</label>
-                <input type="text" name="main_reject_reason" class="border p-2 rounded w-full" value="{{ old('main_reject_reason') }}">
+            <div class="col-span-2">
+                <label class="font-semibold">Part Image</label>
+                <input type="file" name="part_image" class="border p-2 rounded w-full" required>
             </div>
         </div>
 
-        <hr class="my-4">
+        <hr class="my-6">
 
-        <div class="grid grid-cols-2 gap-4">
-            <div>
-                <label class="block font-semibold">Part Image (jpg/png)</label>
-                <input type="file" name="part_image" accept="image/*" class="border p-2 rounded w-full">
-            </div>
+        {{-- Process Section --}}
+        <div class="flex justify-between items-center mb-3">
+            <h3 class="font-semibold text-lg">Process Flow</h3>
+            <button type="button" id="add-process" class="px-3 py-1 border rounded bg-gray-100">+ Add Process</button>
+        </div>
 
-            <div>
-                <label class="block font-semibold">QAL (PDF)</label>
-                <input type="file" name="qal" accept="application/pdf" class="border p-2 rounded w-full">
-            </div>
+        <div id="process-container" class="space-y-4">
 
-            <div>
-                <label class="block font-semibold">Work Layout (PDF)</label>
-                <input type="file" name="work_layout" accept="application/pdf" class="border p-2 rounded w-full">
-            </div>
+            {{-- PROCESS ROW --}}
+            <div class="process-row border rounded p-4 bg-gray-50">
 
-            <div>
-                <label class="block font-semibold">Work Instruction (PDF)</label>
-                <input type="file" name="work_instruction" accept="application/pdf" class="border p-2 rounded w-full">
+                <div class="grid grid-cols-3 gap-3">
+
+                    <div>
+                        <label class="font-semibold">Process</label>
+                        <select name="processes[]" class="process-select border p-2 rounded w-full" required>
+                            <option value="">Select Process</option>
+                            <option value="1">Deburr</option>
+                            <option value="2">Polish</option>
+                            <option value="3">Assemble</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="font-semibold">Department</label>
+                        <input type="text" name="departments[]" class="border p-2 rounded w-full" required>
+                    </div>
+
+                    <div>
+                        <label class="font-semibold">Section</label>
+                        <input type="text" name="sections[]" class="border p-2 rounded w-full" required>
+                    </div>
+
+                    <div>
+                        <label class="font-semibold">Machine / Line</label>
+                        <input type="text" name="machine_lines[]" class="border p-2 rounded w-full" required>
+                    </div>
+
+                    <div>
+                        <label class="font-semibold">Operator</label>
+                        <input type="text" name="operators[]" class="border p-2 rounded w-full" required>
+                    </div>
+
+                    <div>
+                        <label class="font-semibold">MCT</label>
+                        <input type="number" name="mcts[]" class="border p-2 rounded w-full">
+                    </div>
+
+                    <div>
+                        <label class="font-semibold">CT</label>
+                        <input type="number" name="cts[]" class="border p-2 rounded w-full">
+                    </div>
+
+                    <div>
+                        <label class="font-semibold">QAL (PDF)</label>
+                        <input type="file" name="qals[]" class="border p-2 rounded w-full">
+                    </div>
+
+                    <div>
+                        <label class="font-semibold">Work Layout (PDF)</label>
+                        <input type="file" name="work_layouts[]" class="border p-2 rounded w-full">
+                    </div>
+
+                    <div>
+                        <label class="font-semibold">Work Instruction (PDF)</label>
+                        <input type="file" name="work_instructions[]" class="border p-2 rounded w-full">
+                    </div>
+
+                </div>
+
+                <div class="text-right mt-3">
+                    <button type="button" class="remove-process text-red-600 text-sm">Remove Process</button>
+                </div>
+
             </div>
         </div>
 
-        <div class="mt-6 flex gap-2">
-            <button type="submit" class="bg-black text-white px-4 py-2 rounded">Create Part</button>
-            <a href="{{ route('parts.manage') }}" class="border px-4 py-2 rounded">Cancel</a>
+        <hr class="my-6">
+
+        <div class="flex gap-3">
+            <button type="submit" class="bg-black text-white px-5 py-2 rounded">Create Part</button>
+            <a href="#" class="border px-5 py-2 rounded">Cancel</a>
         </div>
+
     </form>
 </div>
+
+<script>
+    // Add/Remove Process
+    document.getElementById('add-process').addEventListener('click', () => {
+        const container = document.getElementById('process-container');
+        const row = document.querySelector('.process-row').cloneNode(true);
+        row.querySelectorAll('input, select').forEach(el => el.value = '');
+        container.appendChild(row);
+    });
+
+    document.addEventListener('click', function (e) {
+        if (e.target.classList.contains('remove-process')) {
+            const rows = document.querySelectorAll('.process-row');
+            if (rows.length > 1) {
+                e.target.closest('.process-row').remove();
+            }
+        }
+    });
+</script>
 
 @endsection
