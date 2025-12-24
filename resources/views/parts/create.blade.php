@@ -58,73 +58,82 @@
 
         <div id="process-container" class="space-y-4">
 
-            {{-- PROCESS ROW --}}
-            <div class="process-row border rounded p-4 bg-gray-50">
+            {{-- NEW PROCESSES --}}
+                <div class="process-row border rounded p-4 bg-gray-50">
 
-                <div class="grid grid-cols-3 gap-3">
+                    <div class="grid grid-cols-3 gap-3">
+                        <div>
+                            <label class="font-semibold">Process</label>
+                            <select name="processes[]" class="process-select border p-2 rounded w-full" required>
+                                <option value="">Select Process</option>
+                                <option value="1">Deburr</option>
+                                <option value="2">Polish</option>
+                                <option value="3">Assemble</option>
+                            </select>
+                        </div>
 
-                    <div>
-                        <label class="font-semibold">Process</label>
-                        <select name="processes[]" class="process-select border p-2 rounded w-full" required>
-                            <option value="">Select Process</option>
-                            <option value="1">Deburr</option>
-                            <option value="2">Polish</option>
-                            <option value="3">Assemble</option>
-                        </select>
+                        <div>
+                            <label class="font-semibold">Department</label>
+                            <input type="text" name="departments[]"
+                                class="border p-2 rounded w-full">
+                        </div>
+
+                        <div>
+                            <label class="font-semibold">Section</label>
+                            <input type="text" name="sections[]"
+                                class="border p-2 rounded w-full">
+                        </div>
+
+
+                        <div>
+                            <label class="font-semibold">Machine / Line</label>
+                            <input type="text" name="machine_lines[]"
+                                class="border p-2 rounded w-full">
+                        </div>
+
+                        <div>
+                            <label class="font-semibold">Operator</label>
+                            <input type="text" name="operators[]"
+                                class="border p-2 rounded w-full">
+                        </div>
+
+                        <div>
+                            <label class="font-semibold">MCT</label>
+                            <input type="number" name="mcts[]"
+                                class="border p-2 rounded w-full">
+                        </div>
+
+                        <div>
+                            <label class="font-semibold">CT</label>
+                            <input type="number" name="cts[]"
+                                class="border p-2 rounded w-full">
+                        </div>
                     </div>
 
-                    <div>
-                        <label class="font-semibold">Department</label>
-                        <input type="text" name="departments[]" class="border p-2 rounded w-full" required>
+                    <div class="grid grid-cols-3 gap-3 mt-3">
+                        <div>
+                            <label class="font-semibold">QAL (PDF)</label>
+                            <input type="file" name="qals[]" accept="application/pdf"
+                                class="border p-2 rounded w-full">
+                        </div>
+
+                        <div>
+                            <label class="font-semibold">Work Layout (PDF)</label>
+                            <input type="file" name="work_layouts[]" accept="application/pdf"
+                                class="border p-2 rounded w-full">
+                        </div>
+
+                        <div>
+                            <label class="font-semibold">Work Instruction (PDF)</label>
+                            <input type="file" name="work_instructions[]" accept="application/pdf"
+                                class="border p-2 rounded w-full">
+                        </div>
                     </div>
 
-                    <div>
-                        <label class="font-semibold">Section</label>
-                        <input type="text" name="sections[]" class="border p-2 rounded w-full" required>
+                    <div class="text-right mt-3">
+                        <button type="button" class="remove-process text-red-600 text-sm">Remove Process</button>
                     </div>
-
-                    <div>
-                        <label class="font-semibold">Machine / Line</label>
-                        <input type="text" name="machine_lines[]" class="border p-2 rounded w-full" required>
-                    </div>
-
-                    <div>
-                        <label class="font-semibold">Operator</label>
-                        <input type="text" name="operators[]" class="border p-2 rounded w-full" required>
-                    </div>
-
-                    <div>
-                        <label class="font-semibold">MCT</label>
-                        <input type="number" name="mcts[]" class="border p-2 rounded w-full">
-                    </div>
-
-                    <div>
-                        <label class="font-semibold">CT</label>
-                        <input type="number" name="cts[]" class="border p-2 rounded w-full">
-                    </div>
-
-                    <div>
-                        <label class="font-semibold">QAL (PDF)</label>
-                        <input type="file" name="qals[]" class="border p-2 rounded w-full">
-                    </div>
-
-                    <div>
-                        <label class="font-semibold">Work Layout (PDF)</label>
-                        <input type="file" name="work_layouts[]" class="border p-2 rounded w-full">
-                    </div>
-
-                    <div>
-                        <label class="font-semibold">Work Instruction (PDF)</label>
-                        <input type="file" name="work_instructions[]" class="border p-2 rounded w-full">
-                    </div>
-
                 </div>
-
-                <div class="text-right mt-3">
-                    <button type="button" class="remove-process text-red-600 text-sm">Remove Process</button>
-                </div>
-
-            </div>
         </div>
 
         <hr class="my-6">
@@ -133,7 +142,6 @@
             <button type="submit" class="bg-black text-white px-5 py-2 rounded">Create Part</button>
             <a href="#" class="border px-5 py-2 rounded">Cancel</a>
         </div>
-
     </form>
 </div>
 

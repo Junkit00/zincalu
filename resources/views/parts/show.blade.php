@@ -31,45 +31,52 @@
         <!-- PROCESS TAGS -->
         <div>
             <strong>Process:</strong>
-            <div class="flex flex-wrap gap-2 mt-1">
-                @forelse($part->processes as $process)
-                    <span class="px-2 py-1 text-xxs rounded bg-green-100 text-green-700">
+            <div class="flex flex-wrap gap-2 mt-2">
+                @foreach($part->processes as $index => $process)
+                    <button
+                        type="button"
+                        class="process-tab px-3 py-1 text-xs rounded border
+                            {{ $index === 0 ? 'bg-green-500 text-white' : 'bg-gray-100 text-gray-700' }}"
+                        data-process-id="{{ $process->id }}">
                         {{ $process->name }}
-                    </span>
-                @empty
-                    <span class="text-gray-400">N/A</span>
-                @endforelse
+                    </button>
+                @endforeach
             </div>
         </div>
 
         <!-- PROCESS TABLE -->
         <div class="mt-4">
-            <table class="w-full border-2 border-black-100 text-sm table-auto">
+            <table class="w-full border text-sm">
                 <thead class="bg-gray-300">
                     <tr>
-                        <th class="border-2 border-black-100 p-2 text-left w-[20%]">Process</th>
-                        <th class="border-2 border-black-100 p-2 w-[15%]">Machine / Line</th>
-                        <th class="border-2 border-black-100 p-2 w-[15%]">Operator</th>
-                        <th class="border-2 border-black-100 p-2 w-[10%]">MCT</th>
-                        <th class="border-2 border-black-100 p-2 w-[10%]">CT</th>
+                        <th class="border p-2 w-[10%]">Department</th>
+                        <th class="border p-2 w-[10%]">Section</th>
+                        <th class="border p-2 w-[15%]">Machine / Line</th>
+                        <th class="border p-2 w-[15%]">Operator</th>
+                        <th class="border p-2 w-[10%]">MCT</th>
+                        <th class="border p-2 w-[10%]">CT</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach($part->processes as $process)
-                        <tr>
-                            <td class="border-2 border-black-100 p-2 font-semibold">
-                                {{ $process->name }}
+                    @foreach($part->processes as $index => $process)
+                        <tr class="process-row {{ $index !== 0 ? 'hidden' : '' }}"
+                            data-process-id="{{ $process->id }}">
+                            <td class="border p-2 text-center">
+                                {{ $process->pivot->department ?? '—' }}
                             </td>
-                            <td class="border-2 border-black-100 p-2">
+                            <td class="border p-2 text-center">
+                                {{ $process->pivot->section ?? '—' }}
+                            </td>
+                            <td class="border p-2 text-center">
                                 {{ $process->pivot->machine_line ?? '—' }}
                             </td>
-                            <td class="border-2 border-black-100 p-2">
+                            <td class="border p-2 text-center">
                                 {{ $process->pivot->operator ?? '—' }}
                             </td>
-                            <td class="border-2 border-black-100 p-2 text-center">
+                            <td class="border p-2 text-center">
                                 {{ $process->pivot->mct ?? '—' }}
                             </td>
-                            <td class="border-2 border-black-400 p-2 text-center">
+                            <td class="border p-2 text-center">
                                 {{ $process->pivot->ct ?? '—' }}
                             </td>
                         </tr>
@@ -82,30 +89,31 @@
         <div class="mt-6">
             <h3 class="font-semibold mb-2">PDFs</h3>
 
-            @foreach($part->processes as $process)
-                <div class="mb-4 border rounded p-3">
+            @foreach($part->processes as $index => $process)
+                <div class="process-pdf {{ $index !== 0 ? 'hidden' : '' }}"
+                    data-process-id="{{ $process->id }}">
 
                     <div class="flex gap-3 flex-wrap">
                         @if($process->pivot->qal)
                             <a href="{{ asset('uploads/parts/qal/' . $process->pivot->qal) }}"
-                               target="_blank"
-                               class="px-3 py-1 bg-blue-500 text-white rounded text-sm">
+                            target="_blank"
+                            class="px-3 py-1 bg-blue-500 text-white rounded text-sm">
                                 QAL
                             </a>
                         @endif
 
                         @if($process->pivot->work_layout)
                             <a href="{{ asset('uploads/parts/work_layout/' . $process->pivot->work_layout) }}"
-                               target="_blank"
-                               class="px-3 py-1 bg-blue-500 text-white rounded text-sm">
+                            target="_blank"
+                            class="px-3 py-1 bg-blue-500 text-white rounded text-sm">
                                 Work Layout
                             </a>
                         @endif
 
                         @if($process->pivot->work_instruction)
                             <a href="{{ asset('uploads/parts/work_instruction/' . $process->pivot->work_instruction) }}"
-                               target="_blank"
-                               class="px-3 py-1 bg-blue-500 text-white rounded text-sm">
+                            target="_blank"
+                            class="px-3 py-1 bg-blue-500 text-white rounded text-sm">
                                 Work Instruction
                             </a>
                         @endif
@@ -113,8 +121,38 @@
                 </div>
             @endforeach
         </div>
-
+    
     </div>
 </div>
+
+<script>
+    const tabs = document.querySelectorAll('.process-tab');
+    const rows = document.querySelectorAll('.process-row');
+    const pdfs = document.querySelectorAll('.process-pdf');
+
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            const id = tab.dataset.processId;
+
+            // Toggle active tab
+            tabs.forEach(t => {
+                t.classList.remove('bg-green-500', 'text-white');
+                t.classList.add('bg-gray-100', 'text-gray-700');
+            });
+            tab.classList.add('bg-green-500', 'text-white');
+            tab.classList.remove('bg-gray-100', 'text-gray-700');
+
+            // Show selected row
+            rows.forEach(row => {
+                row.classList.toggle('hidden', row.dataset.processId !== id);
+            });
+
+            // Show selected PDFs
+            pdfs.forEach(pdf => {
+                pdf.classList.toggle('hidden', pdf.dataset.processId !== id);
+            });
+        });
+    });
+</script>
 
 @endsection

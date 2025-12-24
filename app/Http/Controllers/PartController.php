@@ -34,12 +34,12 @@ class PartController extends Controller
 
     // Public show
     public function show($id)
-{
-    // Eager load processes so we can access them in the view
-    $part = Part::with('processes')->findOrFail($id);
+    {
+        // Eager load processes so we can access them in the view
+        $part = Part::with('processes')->findOrFail($id);
 
-    return view('parts.show', compact('part'));
-}
+        return view('parts.show', compact('part'));
+    }
 
   
     // Advanced CRUD
@@ -64,135 +64,39 @@ class PartController extends Controller
 
     // Show create form
     public function create()
-{
-    return view('parts.create');
-}
-
-// Store new part (with uploaded files and multiple processes)
-public function store(Request $request)
-{
-    $validated = $request->validate([
-        'part_name' => ['required', 'string', 'max:255'],
-        'customer' => ['required', 'string', 'max:255'],
-        'material' => ['required', 'string', 'max:255'],
-        'avg_output_per_day' => 'nullable|numeric',
-        'part_image' => 'required|image|max:5120',
-
-        // Process-related fields
-        'processes.*' => 'required|in:1,2,3',
-        'departments' => 'required|array',
-        'sections' => 'required|array',
-        'machine_lines' => 'required|array',
-        'operators' => 'required|array',
-        'mcts' => 'nullable|array',
-        'cts' => 'nullable|array',
-        'qals' => 'nullable|array',
-        'work_layouts' => 'nullable|array',
-        'work_instructions' => 'nullable|array',
-    ]);
-
-    // Convert certain fields to uppercase
-    $validated['part_name'] = strtoupper($validated['part_name']);
-    $validated['customer'] = strtoupper($validated['customer']);
-    $validated['material'] = strtoupper($validated['material']);
-
-    // Helper to store a file in public/uploads/parts/<folder>
-    $storeFile = function ($file, $folder) {
-        if (!$file) return null;
-        $orig = $file->getClientOriginalName();
-        $ext = $file->getClientOriginalExtension();
-        $name = pathinfo($orig, PATHINFO_FILENAME);
-        $safe = Str::slug($name) . '_' . time() . '.' . $ext;
-        $destination = public_path("uploads/parts/{$folder}/");
-        if (!File::exists($destination)) {
-            File::makeDirectory($destination, 0755, true);
-        }
-        $file->move($destination, $safe);
-        return $safe;
-    };
-
-    // Create part
-    $part = Part::create([
-        'part_name' => $validated['part_name'],
-        'customer' => $validated['customer'],
-        'material' => $validated['material'],
-        'avg_output_per_day' => $validated['avg_output_per_day'] ?? null,
-        'part_image' => $storeFile($request->file('part_image'), 'images'),
-    ]);
-
-    // Save multiple processes with pivot files
-    foreach ($validated['processes'] as $index => $processId) {
-        $part->processes()->attach($processId, [
-            'department' => strtoupper($validated['departments'][$index] ?? ''),
-            'section' => strtoupper($validated['sections'][$index] ?? ''),
-            'machine_line' => strtoupper($validated['machine_lines'][$index] ?? ''),
-            'operator' => strtoupper($validated['operators'][$index] ?? ''),
-            'mct' => $validated['mcts'][$index] ?? null,
-            'ct' => $validated['cts'][$index] ?? null,
-            'qal' => $storeFile($request->file('qals')[$index] ?? null, 'qal'),
-            'work_layout' => $storeFile($request->file('work_layouts')[$index] ?? null, 'work_layout'),
-            'work_instruction' => $storeFile($request->file('work_instructions')[$index] ?? null, 'work_instruction'),
-        ]);
+    {
+        return view('parts.create');
     }
 
-    return redirect()->route('parts.manage')->with('success', 'Part created successfully.');
-}
-
-
-    // Show edit form
-    public function edit($id)
+    // Store new part (with uploaded files and multiple processes)
+    public function store(Request $request)
     {
-        $part = Part::findOrFail($id);
-        return view('parts.edit', compact('part'));
-    }
-
-    // Update part (handle file replacements)
-    public function update(Request $request, $id)
-    {
-        $part = Part::findOrFail($id);
-
         $validated = $request->validate([
             'part_name' => ['required', 'string', 'max:255'],
             'customer' => ['required', 'string', 'max:255'],
-            'machine_line' => ['nullable', 'string', 'max:255'],
-            'operator' => ['nullable', 'string', 'max:255'],
-            'department' => ['required', 'string', 'max:255'],
-            'section' => ['required', 'string', 'max:255'],
             'material' => ['required', 'string', 'max:255'],
-            'mct' => 'nullable|numeric',
-            'ct' => 'nullable|numeric',
             'avg_output_per_day' => 'nullable|numeric',
-            'main_reject_reason' => ['nullable', 'string', 'max:1000'],
+            'part_image' => 'required|image|max:5120',
 
-            'part_image' => 'nullable|image|max:5120',
-            'qal' => 'nullable|file|mimes:pdf|max:10240',
-            'work_layout' => 'nullable|file|mimes:pdf|max:10240',
-            'work_instruction' => 'nullable|file|mimes:pdf|max:10240',
+            // Process-related fields
+            'processes.*' => 'required|in:1,2,3',
+            'departments' => 'required|array',
+            'sections' => 'required|array',
+            'machine_lines' => 'required|array',
+            'operators' => 'required|array',
+            'mcts' => 'nullable|array',
+            'cts' => 'nullable|array',
+            'qals' => 'nullable|array',
+            'work_layouts' => 'nullable|array',
+            'work_instructions' => 'nullable|array',
         ]);
 
         // Convert certain fields to uppercase
         $validated['part_name'] = strtoupper($validated['part_name']);
         $validated['customer'] = strtoupper($validated['customer']);
-        $validated['machine_line'] = isset($validated['machine_line']) ? strtoupper($validated['machine_line']) : null;
-        $validated['operator'] = isset($validated['operator']) ? strtoupper($validated['operator']) : null;
-        $validated['department'] = strtoupper($validated['department']);
-        $validated['section'] = strtoupper($validated['section']);
         $validated['material'] = strtoupper($validated['material']);
 
-        // Update part instance
-        $part->part_name = $validated['part_name'];
-        $part->customer = $validated['customer'] ?? null;
-        $part->machine_line = $validated['machine_line'] ?? null;
-        $part->operator = $validated['operator'] ?? null;
-        $part->department = $validated['department'] ?? null;
-        $part->section = $validated['section'] ?? null;
-        $part->material = $validated['material'] ?? null;
-        $part->mct = $validated['mct'] ?? null;
-        $part->ct = $validated['ct'] ?? null;
-        $part->avg_output_per_day = $validated['avg_output_per_day'] ?? null;
-        $part->main_reject_reason = $validated['main_reject_reason'] ?? null;
-
-        // File storing function (same logic as store)
+        // Helper to store a file in public/uploads/parts/<folder>
         $storeFile = function ($file, $folder) {
             if (!$file) return null;
             $orig = $file->getClientOriginalName();
@@ -207,59 +111,189 @@ public function store(Request $request)
             return $safe;
         };
 
-        // Replace files if a new upload exists; delete old ones
+        // Create part
+        $part = Part::create([
+            'part_name' => $validated['part_name'],
+            'customer' => $validated['customer'],
+            'material' => $validated['material'],
+            'avg_output_per_day' => $validated['avg_output_per_day'] ?? null,
+            'part_image' => $storeFile($request->file('part_image'), 'images'),
+        ]);
+
+        // Save multiple processes with pivot files
+        foreach ($validated['processes'] as $index => $processId) {
+            $part->processes()->attach($processId, [
+                'department' => strtoupper($validated['departments'][$index] ?? ''),
+                'section' => strtoupper($validated['sections'][$index] ?? ''),
+                'machine_line' => strtoupper($validated['machine_lines'][$index] ?? ''),
+                'operator' => strtoupper($validated['operators'][$index] ?? ''),
+                'mct' => $validated['mcts'][$index] ?? null,
+                'ct' => $validated['cts'][$index] ?? null,
+                'qal' => $storeFile($request->file('qals')[$index] ?? null, 'qal'),
+                'work_layout' => $storeFile($request->file('work_layouts')[$index] ?? null, 'work_layout'),
+                'work_instruction' => $storeFile($request->file('work_instructions')[$index] ?? null, 'work_instruction'),
+            ]);
+        }
+
+        return redirect()->route('parts.manage')->with('success', 'Part created successfully.');
+    }
+
+    // Show edit form
+    public function edit($id)
+    {
+        $part = Part::with('processes')->findOrFail($id);
+        $allProcesses = Process::all();
+
+        return view('parts.edit', compact('part', 'allProcesses'));
+    }
+
+
+    // Update part (handle file replacements)
+    public function update(Request $request, $id)
+    {
+        $part = Part::with('processes')->findOrFail($id);
+
+        $validated = $request->validate([
+            // PART
+            'part_name' => ['required', 'string', 'max:255'],
+            'customer' => ['nullable', 'string', 'max:255'],
+            'material' => ['nullable', 'string', 'max:255'],
+            'avg_output_per_day' => ['nullable', 'numeric'],
+            'part_image' => ['nullable', 'image', 'max:5120'],
+
+            // PROCESS
+            'processes' => ['required', 'array'],
+            'processes.*' => ['exists:processes,id'],
+
+            'departments' => ['array'],
+            'sections' => ['array'],
+            'machine_lines' => ['array'],
+            'operators' => ['array'],
+            'mcts' => ['array'],
+            'cts' => ['array'],
+
+            'qals.*' => ['nullable', 'file', 'mimes:pdf', 'max:10240'],
+            'work_layouts.*' => ['nullable', 'file', 'mimes:pdf', 'max:10240'],
+            'work_instructions.*' => ['nullable', 'file', 'mimes:pdf', 'max:10240'],
+        ]);
+
+        // Update
+        $part->update([
+            'part_name' => strtoupper($validated['part_name']),
+            'customer' => isset($validated['customer']) ? strtoupper($validated['customer']) : null,
+            'material' => isset($validated['material']) ? strtoupper($validated['material']) : null,
+            'avg_output_per_day' => $validated['avg_output_per_day'] ?? null,
+        ]);
+
+        // File Helper
+        $storeFile = function ($file, $folder) {
+            if (!$file) return null;
+
+            $name = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+            $ext = $file->getClientOriginalExtension();
+
+            $safe = \Str::slug($name) . '_' . time() . '.' . $ext;
+            $path = public_path("uploads/parts/{$folder}");
+
+            if (!\File::exists($path)) {
+                \File::makeDirectory($path, 0755, true);
+            }
+
+            $file->move($path, $safe);
+            return $safe;
+        };
+
+        // Image
         if ($request->hasFile('part_image')) {
-            if ($part->part_image && File::exists(public_path('uploads/parts/images/' . $part->part_image))) {
-                File::delete(public_path('uploads/parts/images/' . $part->part_image));
+            if ($part->part_image && file_exists(public_path('uploads/parts/images/' . $part->part_image))) {
+                unlink(public_path('uploads/parts/images/' . $part->part_image));
             }
             $part->part_image = $storeFile($request->file('part_image'), 'images');
+            $part->save();
         }
 
-        if ($request->hasFile('qal')) {
-            if ($part->qal && File::exists(public_path('uploads/parts/qal/' . $part->qal))) {
-                File::delete(public_path('uploads/parts/qal/' . $part->qal));
+        // Sync Process
+        $syncData = [];
+
+        foreach ($validated['processes'] as $index => $processId) {
+
+            $existing = $part->processes->firstWhere('id', $processId);
+
+            $syncData[$processId] = [
+                'department' => strtoupper($validated['departments'][$index] ?? ''),
+                'section' => strtoupper($validated['sections'][$index] ?? ''),
+                'machine_line' => strtoupper($validated['machine_lines'][$index] ?? ''),
+                'operator' => strtoupper($validated['operators'][$index] ?? ''),
+                'mct' => $validated['mcts'][$index] ?? null,
+                'ct' => $validated['cts'][$index] ?? null,
+
+                // keep old files unless replaced
+                'qal' => $existing?->pivot->qal,
+                'work_layout' => $existing?->pivot->work_layout,
+                'work_instruction' => $existing?->pivot->work_instruction,
+            ];
+
+            // QAL
+            if ($request->hasFile("qals.$index")) {
+                if ($existing?->pivot->qal) {
+                    @unlink(public_path('uploads/parts/qal/' . $existing->pivot->qal));
+                }
+                $syncData[$processId]['qal'] =
+                    $storeFile($request->file("qals.$index"), 'qal');
             }
-            $part->qal = $storeFile($request->file('qal'), 'qal');
-        }
 
-        if ($request->hasFile('work_layout')) {
-            if ($part->work_layout && File::exists(public_path('uploads/parts/work_layout/' . $part->work_layout))) {
-                File::delete(public_path('uploads/parts/work_layout/' . $part->work_layout));
+            // WORK LAYOUT
+            if ($request->hasFile("work_layouts.$index")) {
+                if ($existing?->pivot->work_layout) {
+                    @unlink(public_path('uploads/parts/work_layout/' . $existing->pivot->work_layout));
+                }
+                $syncData[$processId]['work_layout'] =
+                    $storeFile($request->file("work_layouts.$index"), 'work_layout');
             }
-            $part->work_layout = $storeFile($request->file('work_layout'), 'work_layout');
-        }
 
-        if ($request->hasFile('work_instruction')) {
-            if ($part->work_instruction && File::exists(public_path('uploads/parts/work_instruction/' . $part->work_instruction))) {
-                File::delete(public_path('uploads/parts/work_instruction/' . $part->work_instruction));
+            // WORK INSTRUCTION
+            if ($request->hasFile("work_instructions.$index")) {
+                if ($existing?->pivot->work_instruction) {
+                    @unlink(public_path('uploads/parts/work_instruction/' . $existing->pivot->work_instruction));
+                }
+                $syncData[$processId]['work_instruction'] =
+                    $storeFile($request->file("work_instructions.$index"), 'work_instruction');
             }
-            $part->work_instruction = $storeFile($request->file('work_instruction'), 'work_instruction');
         }
 
-        $part->save();
+        $part->processes()->sync($syncData);
 
         return redirect()->route('parts.manage')->with('success', 'Part updated successfully.');
     }
 
+
     // Delete part and related files
     public function destroy($id)
     {
-        $part = Part::findOrFail($id);
+        $part = Part::with('processes')->findOrFail($id);
 
-        // delete files if exist
-        if ($part->part_image && File::exists(public_path('uploads/parts/Images/' . $part->part_image))) {
-            File::delete(public_path('uploads/parts/Images/' . $part->part_image));
-        }
-        if ($part->qal && File::exists(public_path('uploads/parts/QAL/' . $part->qal))) {
-            File::delete(public_path('uploads/parts/QAL/' . $part->qal));
-        }
-        if ($part->work_layout && File::exists(public_path('uploads/parts/Work_Layout/' . $part->work_layout))) {
-            File::delete(public_path('uploads/parts/Work_layout/' . $part->work_layout));
-        }
-        if ($part->work_instruction && File::exists(public_path('uploads/parts/Work_Instruction/' . $part->work_instruction))) {
-            File::delete(public_path('uploads/parts/Work_Instruction/' . $part->work_instruction));
+        if ($part->part_image && File::exists(public_path('uploads/parts/images/' . $part->part_image))) {
+            File::delete(public_path('uploads/parts/images/' . $part->part_image));
         }
 
+        foreach ($part->processes as $process) {
+
+            $pivot = $process->pivot;
+
+            if ($pivot->qal && File::exists(public_path('uploads/parts/qal/' . $pivot->qal))) {
+                File::delete(public_path('uploads/parts/qal/' . $pivot->qal));
+            }
+
+            if ($pivot->work_layout && File::exists(public_path('uploads/parts/work_layout/' . $pivot->work_layout))) {
+                File::delete(public_path('uploads/parts/work_layout/' . $pivot->work_layout));
+            }
+
+            if ($pivot->work_instruction && File::exists(public_path('uploads/parts/work_instruction/' . $pivot->work_instruction))) {
+                File::delete(public_path('uploads/parts/work_instruction/' . $pivot->work_instruction));
+            }
+        }
+
+        $part->processes()->detach();
         $part->delete();
 
         return redirect()->route('parts.manage')->with('success', 'Part deleted successfully.');
