@@ -66,9 +66,12 @@
                             <label class="font-semibold">Process</label>
                             <select name="processes[]" class="process-select border p-2 rounded w-full" required>
                                 <option value="">Select Process</option>
-                                <option value="1">Deburr</option>
-                                <option value="2">Polish</option>
-                                <option value="3">Assemble</option>
+                                <option value="1">Die Casting</option>
+                                <option value="2">Shotblast</option>
+                                <option value="3">Deburring</option>
+                                <option value="4">Powder Coating</option>
+                                <option value="5">Machining</option>
+                                <option value="6">Packing</option>
                             </select>
                         </div>
 
@@ -140,7 +143,7 @@
 
         <div class="flex gap-3">
             <button type="submit" class="bg-black text-white px-5 py-2 rounded">Create Part</button>
-            <a href="#" class="border px-5 py-2 rounded">Cancel</a>
+            <a href="{{ route('parts.manage') }}" class="border px-5 py-2 rounded">Cancel</a>
         </div>
     </form>
 </div>

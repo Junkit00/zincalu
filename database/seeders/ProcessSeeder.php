@@ -14,9 +14,12 @@ class ProcessSeeder extends Seeder
     public function run(): void
     {
         Process::insert([
-            ['id' => 1, 'name' => 'Deburr'],
-            ['id' => 2, 'name' => 'Polish'],
-            ['id' => 3, 'name' => 'Assemble'],
+            ['id' => 1, 'name' => 'Die Casting'],
+            ['id' => 2, 'name' => 'Shotblast'],
+            ['id' => 3, 'name' => 'Deburring'],
+            ['id' => 4, 'name' => 'Powder Coating'],
+            ['id' => 5, 'name' => 'Machining'],
+            ['id' => 6, 'name' => 'Packing'],
         ]);
     }
 }
