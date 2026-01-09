@@ -14,6 +14,15 @@ class Part extends Model
         'material',
         'avg_output_per_day',
         'part_image',
+        'drawing',
+        'inspection_gauge',
+        'machine_setup_parameter',
+        'operation_jig',
+        'operation_sheet',
+        'process_standard_sheet',
+        'program_list',
+        'project_status',
+        'tooling',
     ];
 
     public function processes()

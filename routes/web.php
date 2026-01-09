@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PartController;
 use App\Http\Controllers\CustomerController;
+use Illuminate\Http\Request;
 
 Route::get('/', [PartController::class, 'index'])->name('dashboard');
 
@@ -21,10 +22,3 @@ Route::delete('/manage/parts/{id}', [PartController::class, 'destroy'])->name('p
 // Customer Page
 Route::get('/customers', [CustomerController::class, 'index'])->name('customers.index');
 Route::get('/customers/{customer}', [CustomerController::class, 'parts'])->name('customers.part');
-
-// file downloads (keep if desired)
-Route::get('/pdf/{file}', function ($file) {
-    $path = public_path('uploads/parts/pdfs/' . $file);
-    if (!file_exists($path)) abort(404);
-    return response()->download($path);
-})->name('pdf.download');

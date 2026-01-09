@@ -78,8 +78,20 @@ class PartController extends Controller
             'avg_output_per_day' => 'nullable|numeric',
             'part_image' => 'required|image|max:5120',
 
+            // PART-LEVEL DOCUMENTS
+            'drawing' => 'nullable|file|mimes:pdf|max:51200',
+            'inspection_gauge' => 'nullable|file|mimes:pdf|max:51200',
+            'machine_setup_parameter' => 'nullable|file|mimes:pdf|max:51200',
+            'operation_jig' => 'nullable|file|mimes:pdf|max:51200',
+            'operation_sheet' => 'nullable|file|mimes:pdf|max:51200',
+            'process_standard_sheet' => 'nullable|file|mimes:pdf|max:51200',
+            'program_list' => 'nullable|file|mimes:pdf|max:51200',
+            'project_status' => 'nullable|file|mimes:pdf|max:51200',
+            'tooling' => 'nullable|file|mimes:pdf|max:51200',
+
+
             // Process-related fields
-            'processes.*' => 'required|in:1,2,3',
+            'processes.*' => 'required|in:1,2,3,4,5,6',
             'departments' => 'required|array',
             'sections' => 'required|array',
             'machine_lines' => 'required|array',
@@ -119,6 +131,26 @@ class PartController extends Controller
             'avg_output_per_day' => $validated['avg_output_per_day'] ?? null,
             'part_image' => $storeFile($request->file('part_image'), 'images'),
         ]);
+
+        $partDocs = [
+            'drawing',
+            'inspection_gauge',
+            'machine_setup_parameter',
+            'operation_jig',
+            'operation_sheet',
+            'process_standard_sheet',
+            'program_list',
+            'project_status',
+            'tooling',
+        ];
+
+        foreach ($partDocs as $doc) {
+            if ($request->hasFile($doc)) {
+                $part->$doc = $storeFile($request->file($doc), $doc);
+            }
+        }
+
+        $part->save();
 
         // Save multiple processes with pivot files
         foreach ($validated['processes'] as $index => $processId) {
@@ -161,6 +193,17 @@ class PartController extends Controller
             'avg_output_per_day' => ['nullable', 'numeric'],
             'part_image' => ['nullable', 'image', 'max:5120'],
 
+            // PART-LEVEL DOCUMENTS
+            'drawing' => 'nullable|file|mimes:pdf|max:10240',
+            'inspection_gauge' => 'nullable|file|mimes:pdf|max:10240',
+            'machine_setup_parameter' => 'nullable|file|mimes:pdf|max:10240',
+            'operation_jig' => 'nullable|file|mimes:pdf|max:10240',
+            'operation_sheet' => 'nullable|file|mimes:pdf|max:10240',
+            'process_standard_sheet' => 'nullable|file|mimes:pdf|max:10240',
+            'program_list' => 'nullable|file|mimes:pdf|max:10240',
+            'project_status' => 'nullable|file|mimes:pdf|max:10240',
+            'tooling' => 'nullable|file|mimes:pdf|max:10240',
+
             // PROCESS
             'processes' => ['required', 'array'],
             'processes.*' => ['exists:processes,id'],
@@ -185,6 +228,7 @@ class PartController extends Controller
             'avg_output_per_day' => $validated['avg_output_per_day'] ?? null,
         ]);
 
+
         // File Helper
         $storeFile = function ($file, $folder) {
             if (!$file) return null;
@@ -202,6 +246,31 @@ class PartController extends Controller
             $file->move($path, $safe);
             return $safe;
         };
+
+        $partDocs = [
+            'drawing',
+            'inspection_gauge',
+            'machine_setup_parameter',
+            'operation_jig',
+            'operation_sheet',
+            'process_standard_sheet',
+            'program_list',
+            'project_status',
+            'tooling',
+        ];
+
+        foreach ($partDocs as $doc) {
+            if ($request->hasFile($doc)) {
+
+                if ($part->$doc && File::exists(public_path("uploads/parts/$doc/".$part->$doc))) {
+                    File::delete(public_path("uploads/parts/$doc/".$part->$doc));
+                }
+
+                $part->$doc = $storeFile($request->file($doc), $doc);
+            }
+        }
+
+        $part->save();
 
         // Image
         if ($request->hasFile('part_image')) {
@@ -293,6 +362,24 @@ class PartController extends Controller
             }
         }
 
+        $partDocs = [
+            'drawing',
+            'inspection_gauge',
+            'machine_setup_parameter',
+            'operation_jig',
+            'operation_sheet',
+            'process_standard_sheet',
+            'program_list',
+            'project_status',
+            'tooling',
+        ];
+
+        foreach ($partDocs as $doc) {
+            if ($part->$doc && File::exists(public_path("uploads/parts/$doc/".$part->$doc))) {
+                File::delete(public_path("uploads/parts/$doc/".$part->$doc));
+            }
+        }
+        
         $part->processes()->detach();
         $part->delete();
 

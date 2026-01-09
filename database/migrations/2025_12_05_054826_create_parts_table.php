@@ -18,6 +18,17 @@ return new class extends Migration
             $table->string('material')->nullable();
             $table->integer('avg_output_per_day')->nullable();
             $table->string('part_image')->nullable();
+            
+            $table->string('drawing')->nullable();
+            $table->string('inspection_gauge')->nullable();
+            $table->string('machine_setup_parameter')->nullable();
+            $table->string('operation_jig')->nullable();
+            $table->string('operation_sheet')->nullable();
+            $table->string('process_standard_sheet')->nullable();
+            $table->string('program_list')->nullable();
+            $table->string('project_status')->nullable();
+            $table->string('tooling')->nullable();
+
             $table->timestamps();
         });
     }

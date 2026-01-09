@@ -2,6 +2,7 @@
 
 @section('content')
 
+
 <div class="grid grid-cols-2 gap-10">
 
     <!-- LEFT: PART IMAGE -->
@@ -14,7 +15,6 @@
             <span class="text-gray-400">No Image Available</span>
         @endif
     </div>
-
 
     <!-- RIGHT: PART DETAILS -->
     <div class="space-y-4">
@@ -121,7 +121,47 @@
                 </div>
             @endforeach
         </div>
-    
+
+        <!-- PART DOCUMENTS -->
+        <hr class="my-6">
+
+        <h3 class="font-semibold text-lg mb-3">Part Documents</h3>
+
+        <div class="grid grid-cols-3 gap-4">
+
+            @php
+                $docs = [
+                    'drawing' => 'Drawing',
+                    'inspection_gauge' => 'Inspection Gauge',
+                    'machine_setup_parameter' => 'Machine Setup Parameter',
+                    'operation_jig' => 'Operation Jig',
+                    'operation_sheet' => 'Operation Sheet',
+                    'process_standard_sheet' => 'Process Standard Sheet',
+                    'program_list' => 'Program List',
+                    'project_status' => 'Project Status',
+                    'tooling' => 'Tooling',
+                ];
+            @endphp
+
+            @foreach($docs as $field => $label)
+                <div class="border rounded p-3 bg-gray-50">
+                    <p class="font-semibold text-sm mb-2">{{ $label }}</p>
+
+                    @if($part->$field)
+                        <a href="{{ asset("uploads/parts/$field/".$part->$field) }}"
+                        target="_blank"
+                        class="text-blue-600 underline text-sm">
+                            View {{ $label }}
+                        </a>
+                    @else
+                        <span class="text-gray-400 text-sm italic">
+                            Not uploaded
+                        </span>
+                    @endif
+                </div>
+            @endforeach
+
+        </div>
     </div>
 </div>
 

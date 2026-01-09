@@ -60,6 +60,48 @@
 
         <hr class="my-6">
 
+        <h3 class="font-semibold text-lg mb-3">Part Documents</h3>
+
+        <div class="grid grid-cols-3 gap-4">
+
+            @php
+                $docs = [
+                    'drawing' => 'Drawing',
+                    'inspection_gauge' => 'Inspection Gauge',
+                    'machine_setup_parameter' => 'Machine Setup Parameter',
+                    'operation_jig' => 'Operation Jig',
+                    'operation_sheet' => 'Operation Sheet',
+                    'process_standard_sheet' => 'Process Standard Sheet',
+                    'program_list' => 'Program List',
+                    'project_status' => 'Project Status',
+                    'tooling' => 'Tooling',
+                ];
+            @endphp
+
+            @foreach($docs as $field => $label)
+                <div>
+                    <label class="font-semibold">{{ $label }}</label>
+
+                    @if($part->$field)
+                        <a href="{{ asset("uploads/parts/$field/".$part->$field) }}"
+                        target="_blank"
+                        class="block text-blue-600 underline text-sm mb-1">
+                            Existing {{ $label }}
+                        </a>
+                    @else
+                        <span class="block text-gray-600 text-sm mb-1">Not uploaded</span>
+                    @endif
+
+                    <input type="file" name="{{ $field }}" accept="application/pdf"
+                        class="border p-2 rounded w-full">
+                </div>
+            @endforeach
+
+        </div>
+
+
+        <hr class="my-6">
+
         {{-- PROCESS SECTION --}}
         <div class="flex justify-between items-center mb-3">
             <h3 class="font-semibold text-lg">Process Flow</h3>
@@ -138,6 +180,8 @@
                                 class="block text-blue-600 underline text-sm mb-1">
                                     Existing QAL
                                 </a>
+                            @else
+                                <span class="block text-gray-600 text-sm mb-1">Not uploaded</span>
                             @endif
 
                             <input type="file" name="qals[]" accept="application/pdf"
@@ -153,6 +197,8 @@
                                 class="block text-blue-600 underline text-sm mb-1">
                                     Existing Layout
                                 </a>
+                            @else
+                                <span class="block text-gray-600 text-sm mb-1">Not uploaded</span>
                             @endif
 
                             <input type="file" name="work_layouts[]" accept="application/pdf"
@@ -168,6 +214,8 @@
                                 class="block text-blue-600 underline text-sm mb-1">
                                     Existing Instruction
                                 </a>
+                            @else
+                                <span class="block text-gray-600 text-sm mb-1">Not uploaded</span>
                             @endif
 
                             <input type="file" name="work_instructions[]" accept="application/pdf"

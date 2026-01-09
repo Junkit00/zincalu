@@ -50,6 +50,69 @@
 
         <hr class="my-6">
 
+        <h3 class="font-semibold text-lg mb-3">Part Documents</h3>
+
+        <div class="grid grid-cols-3 gap-4">
+
+            <div>
+                <label class="font-semibold">Drawing (PDF)</label>
+                <input type="file" name="drawing" accept="application/pdf"
+                    class="border p-2 rounded w-full">
+            </div>
+
+            <div>
+                <label class="font-semibold">Inspection Gauge</label>
+                <input type="file" name="inspection_gauge" accept="application/pdf"
+                    class="border p-2 rounded w-full">
+            </div>
+
+            <div>
+                <label class="font-semibold">Machine Setup Parameter</label>
+                <input type="file" name="machine_setup_parameter" accept="application/pdf"
+                    class="border p-2 rounded w-full">
+            </div>
+
+            <div>
+                <label class="font-semibold">Operation Jig</label>
+                <input type="file" name="operation_jig" accept="application/pdf"
+                    class="border p-2 rounded w-full">
+            </div>
+
+            <div>
+                <label class="font-semibold">Operation Sheet</label>
+                <input type="file" name="operation_sheet" accept="application/pdf"
+                    class="border p-2 rounded w-full">
+            </div>
+
+            <div>
+                <label class="font-semibold">Process Standard Sheet</label>
+                <input type="file" name="process_standard_sheet" accept="application/pdf"
+                    class="border p-2 rounded w-full">
+            </div>
+
+            <div>
+                <label class="font-semibold">Program List</label>
+                <input type="file" name="program_list" accept="application/pdf"
+                    class="border p-2 rounded w-full">
+            </div>
+
+            <div>
+                <label class="font-semibold">Project Status</label>
+                <input type="file" name="project_status" accept="application/pdf"
+                    class="border p-2 rounded w-full">
+            </div>
+
+            <div>
+                <label class="font-semibold">Tooling</label>
+                <input type="file" name="tooling" accept="application/pdf"
+                    class="border p-2 rounded w-full">
+            </div>
+
+        </div>
+
+
+        <hr class="my-6">
+
         {{-- Process Section --}}
         <div class="flex justify-between items-center mb-3">
             <h3 class="font-semibold text-lg">Process Flow</h3>
