@@ -266,9 +266,23 @@
         </div>
 
         <div class="grid grid-cols-3 gap-3 mt-3">
-            <input type="file" name="qals[]" accept="application/pdf">
-            <input type="file" name="work_layouts[]" accept="application/pdf">
-            <input type="file" name="work_instructions[]" accept="application/pdf">
+            <div>
+                <label class="font-style:normal">QAL (PDF)</label>
+                <input type="file" name="qals[]" accept="application/pdf"
+                    class="border p-2 rounded w-full">
+            </div>
+            
+            <div>
+                <label class="font-style:normal">Work Layout (PDF)</label>
+                <input type="file" name="work_layouts[]" accept="application/pdf"
+                    class="border p-2 rounded w-full">
+            </div>
+            
+            <div>
+                <label class="font-style:normal">Work Instruction (PDF)</label>
+                <input type="file" name="work_instructions[]" accept="application/pdf"
+                    class="border p-2 rounded w-full">
+            </div>
         </div>
 
         <div class="text-right mt-3">

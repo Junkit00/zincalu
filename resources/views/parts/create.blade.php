@@ -131,10 +131,15 @@
                                 <option value="">Select Process</option>
                                 <option value="1">Die Casting</option>
                                 <option value="2">Shotblast</option>
-                                <option value="3">Deburring</option>
-                                <option value="4">Powder Coating</option>
-                                <option value="5">Machining</option>
-                                <option value="6">Packing</option>
+                                <option value="3">Buffing</option>
+                                <option value="4">Deburring</option>
+                                <option value="5">Powder Coating</option>
+                                <option value="6">Loading</option>
+                                <option value="7">Machining</option>
+                                <option value="8">Gauge Checking</option>
+                                <option value="9">Assembly</option>
+                                <option value="10">Packing</option>
+                                <option value="11">Rework</option>
                             </select>
                         </div>
 
